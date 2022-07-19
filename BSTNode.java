@@ -1,5 +1,7 @@
 package com.company;
 
+import java.util.ArrayList;
+
 class BSTNode<T>
 {
     public int NodeKey; // ключ узла
@@ -220,4 +222,91 @@ class BST<T>
         }
         return counter;
     }
+
+    public ArrayList<BSTNode> WideAllNodes()
+    {
+        ArrayList<BSTNode> allNodes = new ArrayList<>();
+
+        if(Root == null)
+            return allNodes;
+
+        ArrayList<BSTNode> currentNodesLevel = new ArrayList<>();
+        currentNodesLevel.add(Root);
+
+        while( !currentNodesLevel.isEmpty() )
+        {
+            ArrayList<BSTNode> nextNodesLevel = new ArrayList<>();
+            for(BSTNode node : currentNodesLevel)
+            {
+                allNodes.add(node);
+
+                if(node.LeftChild != null)
+                    nextNodesLevel.add(node.LeftChild);
+                if(node.RightChild != null)
+                    nextNodesLevel.add(node.RightChild);
+            }
+            currentNodesLevel = nextNodesLevel;
+        }
+
+        return allNodes;
+    }
+
+    public ArrayList<BSTNode> DeepAllNodes(int order)
+    {
+        ArrayList<BSTNode> allNodes = new ArrayList<>();
+
+        if(Root == null)
+            return allNodes;
+
+        switch (order)
+        {
+            case 0:
+                recursiveDeepInOrder(Root, allNodes);
+                break;
+            case 1:
+                recursiveDeepPostOrder(Root, allNodes);
+                break;
+            case 2:
+                recursiveDeepPreOrder(Root, allNodes);
+                break;
+            default: return null;
+        }
+
+        return allNodes;
+    }
+
+    private void recursiveDeepInOrder(BSTNode node, ArrayList<BSTNode> nodes)
+    {
+        if(node.LeftChild != null)
+            recursiveDeepInOrder(node.LeftChild, nodes);
+
+        nodes.add(node);
+
+        if(node.RightChild != null)
+            recursiveDeepInOrder(node.RightChild, nodes);
+
+    }
+
+    private void recursiveDeepPostOrder(BSTNode node, ArrayList<BSTNode> nodes)
+    {
+        if(node.LeftChild != null)
+            recursiveDeepPostOrder(node.LeftChild, nodes);
+
+        if(node.RightChild != null)
+            recursiveDeepPostOrder(node.RightChild, nodes);
+
+        nodes.add(node);
+    }
+
+    private void recursiveDeepPreOrder(BSTNode node, ArrayList<BSTNode> nodes)
+    {
+        nodes.add(node);
+
+        if(node.LeftChild != null)
+            recursiveDeepPreOrder(node.LeftChild, nodes);
+
+        if(node.RightChild != null)
+            recursiveDeepPreOrder(node.RightChild, nodes);
+    }
+
 }
