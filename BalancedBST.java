@@ -47,7 +47,7 @@ class BalancedBST
         if (Root == null)
         {
             Root = node;
-            Root.Level = 1;
+            Root.Level = 0;
         }
 
         if (node.Parent != null)
