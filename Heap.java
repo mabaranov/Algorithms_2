@@ -24,7 +24,7 @@ class Heap
     public int GetMax()
     {
         // вернуть значение корня и перестроить кучу
-        if(HeapArray == null)
+        if(HeapArray == null || count == 0)
             return -1; // если куча пуста
 
         int root = HeapArray[0];
