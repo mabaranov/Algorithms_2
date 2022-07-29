@@ -70,17 +70,21 @@ class Heap
         {
             int indexLeftChild = 2 * i + 1;
             int indexRightChild = 2 * i + 2;
-            int indexGreatestChild = (HeapArray[indexLeftChild] > HeapArray[indexRightChild] ? indexLeftChild : indexRightChild);
+            int indexGreatestChild = i;
 
-            if(HeapArray[i] < HeapArray[indexGreatestChild])
-            {
-                int tmp = HeapArray[i];
-                HeapArray[i] = HeapArray[indexGreatestChild];
-                HeapArray[indexGreatestChild] = tmp;
-                i = indexGreatestChild;
-            }
-            else
+            if((indexLeftChild < count) && (HeapArray[indexLeftChild] > HeapArray[indexGreatestChild]))
+                indexGreatestChild = indexLeftChild;
+
+            if((indexRightChild < count) && (HeapArray[indexRightChild] > HeapArray[indexGreatestChild]))
+                indexGreatestChild = indexRightChild;
+
+            if(indexGreatestChild == i)
                 break;
+
+            int tmp = HeapArray[i];
+            HeapArray[i] = HeapArray[indexGreatestChild];
+            HeapArray[indexGreatestChild] = tmp;
+            i = indexGreatestChild;
         }
     }
 }
