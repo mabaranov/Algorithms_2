@@ -18,6 +18,31 @@ public class SimpleTreeNode<T>
 
 class SimpleTree<T>
 {
+    public ArrayList<T> EvenTrees()
+    {
+        ArrayList<T> listNodesForBreak = new ArrayList<>();
+
+        recursiveSearchEvenTrees(listNodesForBreak, Root);
+
+        return listNodesForBreak;
+    }
+
+    private void recursiveSearchEvenTrees(ArrayList<T> list, SimpleTreeNode<T> node)
+    {
+        if(node.Children == null)
+            return;
+
+        for(SimpleTreeNode<T> element : node.Children) {
+            int count = recursiveCount(element, false);
+            if( count%2 == 0)
+            {
+                list.add(element.Parent.NodeValue);
+                list.add(element.NodeValue);
+            }
+            recursiveSearchEvenTrees(list, element);
+        }
+    }
+
     public SimpleTreeNode<T> Root; // корень, может быть null
 
     public SimpleTree(SimpleTreeNode<T> root)
