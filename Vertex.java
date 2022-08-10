@@ -5,9 +5,11 @@ import java.util.*;
 class Vertex
 {
     public int Value;
+    public boolean Hit;
     public Vertex(int val)
     {
         Value = val;
+        Hit = false;
     }
 }
 
@@ -22,6 +24,45 @@ class SimpleGraph
         max_vertex = size;
         m_adjacency = new int [size][size];
         vertex = new Vertex[size];
+    }
+
+    public ArrayList<Vertex> DepthFirstSearch(int VFrom, int VTo)
+    {
+        // Узлы задаются позициями в списке vertex.
+        // Возвращается список узлов -- путь из VFrom в VTo.
+        // Список пустой, если пути нету.
+        Stack<Vertex> nodesPath = new Stack<>();
+        searchNextNode(VFrom, nodesPath, VTo);
+
+        return new ArrayList<Vertex>(nodesPath);
+    }
+
+    private boolean searchNextNode(int nodeFrom, Stack<Vertex> nodesPath, int nodeTo)
+    {
+        vertex[nodeFrom].Hit = true;
+        nodesPath.push(vertex[nodeFrom]);
+        for(int i=0; i<max_vertex; i++)
+        {
+            if (m_adjacency[nodeFrom][i] == 1 && i == nodeTo) {
+                nodesPath.push(vertex[i]);
+                vertex[i].Hit = true;
+                return true;
+            }
+        }
+        for(int i=0; i<max_vertex; i++)
+        {
+            if (m_adjacency[nodeFrom][i] == 1 && vertex[i].Hit == false)
+            {
+                if (searchNextNode(i, nodesPath, nodeTo))
+                    return true;
+            }
+        }
+
+        nodesPath.pop();
+        if(nodesPath.empty())
+            return false;
+
+        return false;
     }
 
     public void AddVertex(int value)
