@@ -26,72 +26,71 @@ class SimpleGraph
         vertex = new Vertex[size];
     }
 
-
-    public ArrayList<Vertex> BreadthFirstSearch(int VFrom, int VTo)
-    {
-        // Узлы задаются позициями в списке vertex.
-        // Возвращается список узлов -- путь из VFrom в VTo.
-        // Список пустой, если пути нету.
-
-        ArrayList<Vertex> path = new ArrayList<>();
-        int [] predecessors = new int[max_vertex];
-
-        if( BFS(VFrom, VTo, predecessors) )
-        {
-            int t = VTo;
-            path.add(vertex[t]);
-            while(t != VFrom)
-            {
-                path.add(vertex[predecessors[t]]);
-                t = predecessors[t];
-            }
-            Collections.reverse(path);
-        }
-
-        return path;
-    }
-
-    private boolean BFS(int VFrom, int VTo, int [] predecessors)
-    {
-        ArrayDeque<Integer> nodesPath = new ArrayDeque<>();
-
-        vertex[VFrom].Hit = true;
-        nodesPath.addLast( VFrom );
-        predecessors[VFrom] = VFrom;
-
-        if(VFrom == VTo)
-            return true;
-
-        int v2;
-
-        while( !nodesPath.isEmpty() )
-        {
-            int v1 = nodesPath.pop();
-
-            while ((v2 = getIndexUnvisitedNode(v1)) != -1)
-            {
-                vertex[v2].Hit = true;
-                nodesPath.addLast(v2);
-                predecessors[v2] = v1;
-
-                if(v2 == VTo)
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    private int getIndexUnvisitedNode(int n)
-    {
-        for(int i=0; i<max_vertex; i++)
-        {
-            if(m_adjacency[n][i]==1 && vertex[i].Hit == false)
-            {
+    ////////////////
+    private int getNewFromIndex(int vFrom) {
+        for (int i = 0; i < vertex.length; i++){
+            if (vertex[i] != null && IsEdge(vFrom, i) && vertex[i].Hit == false) {
                 return i;
             }
         }
         return -1;
     }
+
+    private int getVertexIndex(Vertex v){
+        for (int i = 0; i < vertex.length; i++){
+            if (vertex[i] != null && vertex[i].Value == v.Value) return i;
+        }
+        return -1;
+    }
+    public ArrayList<Vertex> BreadthFirstSearch(int VFrom, int VTo) {
+        // Узлы задаются позициями в списке vertex.
+        // Возвращается список узлов -- путь из VFrom в VTo.
+        // Список пустой, если пути нету.
+        Queue<Vertex> vertexList = new LinkedList<>();
+        int[] parents = new int[vertex.length];
+        ArrayList<Vertex> path = new ArrayList<>();
+        for (Vertex vert : vertex){
+            if (vert != null) vert.Hit = false;
+        }
+        vertex[VFrom].Hit = true;
+        parents[VFrom] = VFrom;
+        path = bfs(VFrom, VFrom, VTo, vertexList, parents, path);
+        return path;
+    }
+
+    private ArrayList<Vertex> bfs(int start, int vFrom, int vTo, Queue<Vertex> vertexList, int[] parents, ArrayList<Vertex> path){
+        int nearVertexIndex = getNewFromIndex(vFrom); // ближайшая непосещённая вершина
+        if (nearVertexIndex == vTo) {
+            parents[vTo] = vFrom;
+            return getPath(start, vTo, parents, path);
+        }
+        if (nearVertexIndex >= 0) { // если такая вершина есть, но не равно искомой
+            vertex[nearVertexIndex].Hit = true;
+            parents[nearVertexIndex] = vFrom;
+            vertexList.add(vertex[nearVertexIndex]);
+            return bfs(start, vFrom, vTo, vertexList, parents, path);
+        }
+        if (vertexList.isEmpty()) {
+            return new ArrayList<>(); // путь не найден
+        }
+        Vertex newFromVertex = vertexList.remove(); //если нет непосещённых вершин
+        int newFromIndex = getVertexIndex(newFromVertex);
+        return bfs(start, newFromIndex, vTo, vertexList, parents, path);
+    }
+
+    private ArrayList<Vertex> getPath(int start, int vTo, int[] parents, ArrayList<Vertex> path){
+        Vertex v = vertex[vTo];
+        while (v != vertex[start]){
+            path.add(v);
+            v = vertex[parents[vTo]];
+            vTo = parents[vTo];
+        }
+        path.add(vertex[start]);
+        Collections.reverse(path);
+        return path;
+    }
+    ////////////////
+
 
 
     public ArrayList<Vertex> DepthFirstSearch(int VFrom, int VTo)
