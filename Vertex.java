@@ -26,6 +26,46 @@ class SimpleGraph
         vertex = new Vertex[size];
     }
 
+    public ArrayList<Vertex> WeakVertices()
+    {
+        // возвращает список узлов вне треугольников
+        int [] nodesInTriangle = new int[max_vertex];
+
+        for(int i=0; i<max_vertex; i++)
+        {
+            // получим список соседей
+            ArrayList<Integer> neighborNodes = new ArrayList<>();
+
+            for(int j=0; j<max_vertex; j++)
+            {
+                if(m_adjacency[i][j] == 1 && i != j)
+                    neighborNodes.add(j);
+            }
+
+            // найдем кто из соседей соединен
+            int countNeighbors = neighborNodes.size();
+            for(int j=0; j<countNeighbors; j++)
+            {
+                for(int k=0; k<countNeighbors; k++)
+                {
+                    if( (m_adjacency[neighborNodes.get(j)][neighborNodes.get(k)] == 1) && (j != k) )
+                    {
+                        nodesInTriangle[i] = 1;
+                    }
+                }
+            }
+        }
+
+        ArrayList<Vertex> nodesNotInTriangle = new ArrayList<>();
+        for(int i=0; i<max_vertex; i++)
+        {
+            if(nodesInTriangle[i] == 0)
+                nodesNotInTriangle.add(vertex[i]);
+        }
+
+        return nodesNotInTriangle;
+    }
+
     ////////////////
     private int getNewFromIndex(int vFrom) {
         for (int i = 0; i < vertex.length; i++){
@@ -42,7 +82,7 @@ class SimpleGraph
         }
         return -1;
     }
-    public ArrayList<Vertex> BreadthFirstSearch(int VFrom, int VTo) {
+    public ArrayList<Vertex> BreadthFirstSearch1(int VFrom, int VTo) {
         // Узлы задаются позициями в списке vertex.
         // Возвращается список узлов -- путь из VFrom в VTo.
         // Список пустой, если пути нету.
@@ -90,7 +130,71 @@ class SimpleGraph
         return path;
     }
     ////////////////
+    public ArrayList<Vertex> BreadthFirstSearch(int VFrom, int VTo)
+    {
+        // Узлы задаются позициями в списке vertex.
+        // Возвращается список узлов -- путь из VFrom в VTo.
+        // Список пустой, если пути нету.
 
+        ArrayList<Vertex> path = new ArrayList<>();
+        int [] predecessors = new int[max_vertex];
+
+        if( BFS(VFrom, VTo, predecessors) )
+        {
+            int t = VTo;
+            path.add(vertex[t]);
+            while(t != VFrom)
+            {
+                path.add(vertex[predecessors[t]]);
+                t = predecessors[t];
+            }
+            Collections.reverse(path);
+        }
+
+        return path;
+    }
+
+    private boolean BFS(int VFrom, int VTo, int [] predecessors)
+    {
+        ArrayDeque<Integer> nodesPath = new ArrayDeque<>();
+
+        vertex[VFrom].Hit = true;
+        nodesPath.addLast( VFrom );
+        predecessors[VFrom] = VFrom;
+
+        if(VFrom == VTo)
+            return true;
+
+        int v2;
+
+        while( !nodesPath.isEmpty() )
+        {
+            int v1 = nodesPath.pop();
+
+            while ((v2 = getIndexUnvisitedNode(v1)) != -1)
+            {
+                vertex[v2].Hit = true;
+                nodesPath.addLast(v2);
+                predecessors[v2] = v1;
+
+                if(v2 == VTo)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private int getIndexUnvisitedNode(int n)
+    {
+        for(int i=0; i<max_vertex; i++)
+        {
+            if(m_adjacency[n][i]==1 && vertex[i].Hit == false)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 
     public ArrayList<Vertex> DepthFirstSearch(int VFrom, int VTo)
